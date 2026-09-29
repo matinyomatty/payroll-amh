@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>AMH Payroll Entry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one centred column; a slim step rail on top; each step is a single card that fills a phone screen */
+:root{
+  --bg:#eef2f0; --panel:#ffffff; --ink:#15241f; --muted:#5b6b65; --line:#d5dfda; --soft:#e7efeb;
+  --accent:#0d6b5a; --accent-ink:#ffffff; --accent-soft:#d6ece6; --warn:#8a5a00; --warn-soft:#fdf0d2; --crit:#b3261e; --crit-soft:#fbe4e2;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif; --f-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1714;--panel:#16211d;--ink:#e3ece8;--muted:#95a8a0;--line:#2a3a34;--soft:#1d2b26;--accent:#4cc3a6;--accent-ink:#06231c;--accent-soft:#17362e;--warn:#f2c46b;--warn-soft:#33290f;--crit:#ff8a80;--crit-soft:#3a1c1a;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);min-height:100vh}
+.wrap{max-width:620px;margin:0 auto;padding-inline:16px;padding-block:calc(20px + env(safe-area-inset-top,0px)) 48px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.mark{width:44px;height:44px;border-radius:12px;background:var(--accent);display:grid;place-items:center;flex:none}
+.mark svg{width:24px;height:24px}
+header small{display:block;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1,h2{font-family:var(--f-display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:1.35rem} h2{font-size:1.25rem}
+.rail{display:flex;gap:6px;margin:0 0 14px}
+.rail span{flex:1;height:5px;border-radius:99px;background:var(--line)}
+.rail span.on{background:var(--accent)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:16px}
+.lead{margin:-6px 0 0;color:var(--muted);font-size:.95rem}
+.field{display:grid;gap:6px;min-width:0}
+.field label{font-weight:600;font-size:.9rem}
+.field .hint{font-size:.8rem;color:var(--muted)}
+.req{color:var(--crit)}
+input,select,textarea{font:inherit;color:inherit;background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:12px 13px;width:100%;min-width:0}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:460px){.two{grid-template-columns:1fr}}
+.kinds{display:grid;gap:10px}
+.kind{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;text-align:left;border:1.5px solid var(--line);background:var(--panel);border-radius:12px;padding:14px;cursor:pointer;font:inherit;color:inherit}
+.kind:hover{border-color:var(--accent)}
+.kind:focus-visible{outline:3px solid var(--accent-soft);border-color:var(--accent)}
+.kind .ic{width:40px;height:40px;border-radius:10px;background:var(--soft);display:grid;place-items:center}
+.kind .ic svg{width:22px;height:22px;stroke:var(--accent)}
+.kind b{display:block} .kind span{font-size:.85rem;color:var(--muted)}
+.kind .arr{color:var(--muted)}
+.actions{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.btn{border:0;border-radius:10px;padding:13px 20px;font:inherit;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:focus-visible{outline:3px solid var(--accent-soft)}
+.note{padding:10px 12px;border-radius:10px;font-size:.88rem}
+.note.warn{background:var(--warn-soft)} .note.crit{background:var(--crit-soft)}
+.checks{display:grid;gap:6px}
+.summary{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.92rem}
+.summary dt{color:var(--muted)} .summary dd{margin:0;font-weight:500;word-break:break-word}
+.chip{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:.8rem;border-radius:99px;padding:3px 10px}
+.done{text-align:center;justify-items:center}
+.tick{width:68px;height:68px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center}
+.tick svg{width:36px;height:36px;stroke:var(--accent)}
+footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.8rem}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-3px}
+@keyframes s{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+    <div><small>NSK Hospitals · AMH-Pemba</small><h1>Payroll data entry</h1></div>
+  </header>
+  <div class="rail" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  <main id="app"></main>
+  <footer><a href="index.html" style="color:inherit">← Back to start</a> · Entries go straight to the AMH-Pemba Payroll Autobot. Questions? Contact the payroll admin.</footer>
+</div>
+<script>
+var CFG = {"action":"https://docs.google.com/forms/d/e/1FAIpQLSfQBCiL5LFK09BKrXBEqs-5omnP_gIj6WRrXcz12mYNbgg2wA/formResponse","fields":{"Your full name":"1000955805","Access code":"854118330","Your email (for a confirmation)":"617392027","What are you entering?":"6193891","Staff full name (new joiner)":"1173513729","Employee ID":"607571478","Designation":"1645818021","Qualification":"1536754888","Department":"66230042","Date of joining":"1893046941","Beneficiary name (if different)":"1300072115","Account number":"580947327","Bank":"778619866","Mobile number":"1775563741","Remarks (new joiner)":"1775347763","Staff full name (left)":"1548707466","Exit / last working date":"1142736017","Reason (left)":"467350661","Staff full name (renewal)":"985296254","Effective date":"1961534223","New salary (if known)":"95710164","Remarks (renewal)":"141668145","Staff full name (bank change)":"780613155","Beneficiary name":"997065328","New account number":"38445875","Bank (bank change)":"1910790560","Staff full name (leave)":"1658977439","Reason for leave":"842038129","Leave start date":"1996464680","Leave end date":"642543455"},"pages":{"New joiner":1,"Left staff":2,"Renewal / increment":3,"Bank account change":4,"Leave":5}};
+var E = (function ENGINE_(){
+const MONTHS = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+const MONTH_LABEL = m => MONTHS[m][0].toUpperCase() + MONTHS[m].slice(1);
+
+
+function clean(v){
+  if (v === null || v === undefined) return '';
+  return String(v).replace(/[‎‏​ ]/g,' ').replace(/\s+/g,' ').trim();
+}
+function normName(s){
+  let t = clean(s).toUpperCase().replace(/[’'`´]/g,'').replace(/[^A-Z\s-]/g,' ').replace(/-/g,' ');
+  t = t.replace(/\b(MOHD|MOHAMED|MOHAMEDI|MOHAMMAD|MOHAMMEDI|MUHAMAD|MUHAMMAD|MUHAMMED|MOHAMMED)\b/g,'MOHAMMED');
+  return t.replace(/\s+/g,' ').trim();
+}
+function lev(a,b){
+  const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+  let prev=Array.from({length:n+1},(_,i)=>i);
+  for(let i=1;i<=m;i++){ const cur=[i]; for(let j=1;j<=n;j++){ cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); } prev=cur; }
+  return prev[n];
+}
+function tokSim(a,b){
+  if(a===b) return 1;
+  if((a.length===1||b.length===1) && a[0]===b[0]) return .8;
+  const mn=Math.min(a.length,b.length);
+  if(mn>=4 && lev(a,b)<=1) return .9;
+  if(mn>=6 && lev(a,b)<=2) return .8;
+  return 0;
+}
+/* true when two names very likely belong to the same person */
+function nameMatch(a,b){
+  const ta=normName(a).split(' ').filter(Boolean), tb=normName(b).split(' ').filter(Boolean);
+  if(!ta.length||!tb.length) return false;
+  const used=new Set(); let matched=0;
+  for(const x of ta){ let best=-1,bs=0; tb.forEach((y,j)=>{ if(used.has(j)) return; const s=tokSim(x,y); if(s>bs){bs=s;best=j;} }); if(best>=0){used.add(best);matched++;} }
+  const mn=Math.min(ta.length,tb.length);
+  if(matched<2) return false;
+  if(matched===mn) return true;
+  return mn>=4 && matched>=mn-1;
+}
+function slug(s){ return normName(s).toLowerCase().replace(/\s+/g,'-').slice(0,80) || 'unknown'; }
+
+/* ---- dates ---- */
+function serialToISO(n){ const d=new Date(Math.round((n-25569)*86400000)); return d.toISOString().slice(0,10); }
+function toISO(v){
+  if(v===null||v===undefined||v==='') return '';
+  if(typeof v==='number' && v>20000 && v<80000) return serialToISO(v);
+  if(v instanceof Date && !isNaN(v)) return new Date(Date.UTC(v.getFullYear(),v.getMonth(),v.getDate()) + (v.getHours()>=12?86400000:0)).toISOString().slice(0,10);
+  const s=clean(v); let m;
+  if((m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  if((m=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})$/))){ const y=m[3].length===2?'20'+m[3]:m[3]; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
+  return '';
+}
+function fmtDate(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${+d} ${MONTHS[+m-1].slice(0,3).replace(/^./,c=>c.toUpperCase())} ${y}`; }
+function daysInMonth(y,m){ return new Date(Date.UTC(y,m+1,0)).getUTCDate(); }
+
+/* ---- money ---- */
+function parseMoney(text){
+  const s=clean(text).toLowerCase(); if(!s) return null;
+  const re=/(\d[\d,\.]*)\s*(k|m|mil)?\b/g; let m, best=null;
+  while((m=re.exec(s))){ let n=parseFloat(m[1].replace(/,/g,'')); if(isNaN(n)) continue; if(m[2]==='k') n*=1000; if(m[2]==='m'||m[2]==='mil') n*=1e6; if(n>=50000 && n<=50000000 && !/^0\d{8,}/.test(m[1])) { best=n; break; } }
+  if(best===null) return null;
+  const type=/net/.test(s)?'Netpay':(/gross/.test(s)?'Gross Pay':'');
+  return { pay:Math.round(best), type };
+}
+
+/* ---- bank / account / phone ---- */
+function normBank(b){ const s=clean(b).toUpperCase(); if(!s) return ''; if(/PBZ|PEOPLE/.test(s)) return 'PBZ'; if(/NMB/.test(s)) return 'NMB'; if(/CRDB/.test(s)) return 'CRDB'; return s; }
+function guessBank(a){ if(/^\d{10}$/.test(a)) return 'PBZ'; if(/^015[0-9A-Z]{10}$/.test(a)) return 'CRDB'; if(/^10\d{9}$/.test(a)) return 'CRDB'; if(/^[2-9]\d{10}$/.test(a)) return 'NMB'; return ''; }
+function checkAccount(raw, bankRaw){
+  const flags=[]; let bank=normBank(bankRaw);
+  let a=clean(raw).toUpperCase().replace(/[\s,.\-]/g,'');
+  if(typeof raw==='number') a=String(Math.round(raw));
+  if(!a){ flags.push(['crit','No account number']); return {account:'',bank,flags}; }
+  if(/^\d{15,16}$/.test(a)){ flags.push(['crit',`Account "${a}" has ${a.length} digits – looks like a card number, not a bank account`]); return {account:a,bank,flags}; }
+  if(bank==='PBZ' && /^\d{9}$/.test(a)){ a='0'+a; flags.push(['info','Leading zero restored on PBZ account']); }
+  if(bank==='CRDB' && /^15[0-9A-Z]{10}$/.test(a)){ a='0'+a; flags.push(['info','Leading zero restored on CRDB account']); }
+  const g=guessBank(a);
+  if(!bank){ flags.push(['warn', g?`Bank name missing – account format looks like ${g}`:'Bank name missing']); if(g) bank=g; }
+  else if(['PBZ','NMB','CRDB'].includes(bank)){
+    const ok = bank==='PBZ'? /^\d{10}$/.test(a) : bank==='NMB'? /^\d{11}$/.test(a) : (/^015[0-9A-Z]{10}$/.test(a)||/^10\d{9}$/.test(a));
+    if(!ok){ flags.push(['warn', g&&g!==bank ? `Account format looks like ${g}, but bank says ${bank}` : `Unusual ${bank} account length (${a.length} characters)`]); }
+  }
+  return {account:a,bank,flags};
+}
+function normPhone(raw){
+  let d=clean(raw).split(/[,\/]| {2,}/)[0].replace(/\D/g,'');
+  if(!d) return {mobile:'',flag:null};
+  if(d.startsWith('255') && d.length===12) d='0'+d.slice(3);
+  if(d.length===9 && /^[67]/.test(d)) d='0'+d;
+  if(!/^0[67]\d{8}$/.test(d)) return {mobile:clean(raw), flag:['warn',`Mobile number "${clean(raw)}" doesn't look valid`]};
+  return {mobile:d,flag:null};
+}
+
+/* ---- pay scale ---- */
+function matchRule(rules, designation, qualification, remarks){
+  const d=' '+clean(designation).toUpperCase()+' ', q=clean(qualification).toUpperCase(), rem=clean(remarks).toLowerCase();
+  const intern=/intern|until .*licen|without licen|no licen/.test(rem);
+  for(const r of rules){
+    const kws=String(r.keywords||'').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);
+    if(!kws.some(k=>new RegExp('[^A-Z]'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'[^A-Z]').test(d))) continue;
+    if(r.qual && !q.includes(String(r.qual).toUpperCase())) continue;
+    if(r.when==='intern' && !intern) continue;
+    return r;
+  }
+  return null;
+}
+
+function fmtMoney(n){ if(n===null||n===undefined||n==='') return ''; const x=Number(n); return isNaN(x)?String(n):x.toLocaleString('en-US'); }
+const ORD=n=>n+(['th','st','nd','rd'][(n%100>10&&n%100<14)?0:(n%10<4?n%10:0)]||'th');
+
+  return {MONTHS,MONTH_LABEL,clean,normName,lev,nameMatch,slug,toISO,fmtDate,daysInMonth,parseMoney,normBank,guessBank,checkAccount,normPhone,matchRule,fmtMoney,ORD};
+})();
+</script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ICONS={
+  new:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+  left:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>',
+  renewal:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+  account:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/>',
+  leave:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'
+};
+const KINDS=[
+  {k:'new',label:'New joiner',desc:'Someone starting work'},
+  {k:'left',label:'Left staff',desc:'Someone who has left – stop pay'},
+  {k:'renewal',label:'Renewal / increment',desc:'Contract renewed or new salary'},
+  {k:'account',label:'Bank account change',desc:'New account for salary'},
+  {k:'leave',label:'Leave',desc:'Annual, sick, maternity…'}
+];
+const QUALS=['CERTIFICATE','FORM FOUR','DIPLOMA','DEGREE','MASTERS','OTHER'], BANKS=['PBZ','NMB','CRDB','OTHER'];
+const REASONS=['Annual leave','Sick leave','Maternity leave','Paternity leave','Compassionate leave','Unpaid leave','Study leave','Other'];
+/* fields per kind: [key, label, type, required, extra] ; key must match CFG.fields */
+const FIELDS={
+  new:[['name','Staff full name','text',1,{hint:'As on the bank account / ID'}],['empId','Employee ID','text',0],['designation','Designation','text',1,{hint:'e.g. NURSE, DOCTOR, ODERLY, CSSD',list:['NURSE','DOCTOR','ODERLY','PORTER','CSSD','CO','FOOD BILLING','BIOMEDICAL','PHARMACY','RADIOGRAPHER']}],['qualification','Qualification','select',0,{opts:QUALS}],['dept','Department','text',0],['date','Date of joining','date',1],['account','Account number','text',1,{mode:'numeric'}],['bank','Bank','select',1,{opts:BANKS}],['beneficiary','Beneficiary name (if different)','text',0],['mobile','Mobile number','tel',0],['remarks','Remarks','textarea',0]],
+  left:[['name','Staff full name','text',1],['date','Exit / last working date','date',1],['reason','Reason','text',0]],
+  renewal:[['name','Staff full name','text',1],['date','Effective date','date',0],['newPay','New salary (if known)','text',0,{hint:'e.g. 800,000 gross'}],['remarks','Remarks','textarea',0]],
+  account:[['name','Staff full name','text',1],['account','New account number','text',1,{mode:'numeric'}],['bank','Bank','select',1,{opts:BANKS}],['beneficiary','Beneficiary name','text',0,{hint:'Leave blank if the account is in the staff member\'s own name'}]],
+  leave:[['name','Staff full name','text',1],['reason','Reason for leave','select',1,{opts:REASONS}],['date','Start date','date',1],['endDate','End date','date',1]]
+};
+const S={step:0, who:{}, kind:null, data:{}};
+try{ const w=JSON.parse(localStorage.getItem('amh_who')||'{}'); S.who={who:w.who||'',email:w.email||'',code:''}; }catch(e){ S.who={who:'',email:'',code:''}; }
+
+function rail(){ document.querySelectorAll('.rail span').forEach((s,i)=>s.classList.toggle('on',i<=S.step)); }
+function fieldHtml(f,val){
+  const [k,label,type,req,x]=f; const o=x||{}; const id='f_'+k; const v=esc(val??'');
+  let input;
+  if(type==='select') input=`<select id="${id}" ${req?'required':''}><option value="">Choose…</option>${o.opts.map(x=>`<option ${x===val?'selected':''}>${x}</option>`).join('')}</select>`;
+  else if(type==='textarea') input=`<textarea id="${id}" rows="2">${v}</textarea>`;
+  else input=`<input id="${id}" type="${type}" value="${v}" ${req?'required':''} ${o.mode?`inputmode="${o.mode}"`:''} ${o.list?`list="${id}_l"`:''} autocomplete="off">${o.list?`<datalist id="${id}_l">${o.list.map(x=>`<option value="${x}">`).join('')}</datalist>`:''}`;
+  return `<div class="field"><label for="${id}">${esc(label)}${req?' <span class="req">*</span>':''}</label>${input}${o.hint?`<span class="hint">${esc(o.hint)}</span>`:''}</div>`;
+}
+function render(){
+  rail(); const app=$('#app');
+  if(S.step===0){
+    app.innerHTML=`<form class="card" id="f0"><h2>Who is entering?</h2><p class="lead">Your details are only used to confirm your entries.</p>
+      ${fieldHtml(['who','Your full name','text',1],S.who.who)}
+      ${fieldHtml(['code','Access code','password',1,{hint:'The PIN the payroll admin gave you',mode:'numeric'}],S.who.code)}
+      ${fieldHtml(['email','Your email','email',0,{hint:'Recommended – you\'ll get a confirmation for every entry'}],S.who.email)}
+      <div class="actions"><span></span><button class="btn" type="submit">Continue</button></div></form>`;
+    $('#f0').onsubmit=e=>{ e.preventDefault(); S.who={who:$('#f_who').value.trim(),code:$('#f_code').value.trim(),email:$('#f_email').value.trim()};
+      if(!/^\d{4,}$/.test(S.who.code)){ alert2('#f0','The access code is a number with at least 4 digits.'); return; }
+      try{ localStorage.setItem('amh_who',JSON.stringify({who:S.who.who,email:S.who.email})); }catch(x){}
+      S.step=1; render(); };
+    return;
+  }
+  if(S.step===1){
+    app.innerHTML=`<div class="card"><h2>What are you entering?</h2><p class="lead">Hi ${esc(S.who.who.split(' ')[0])} – choose one.</p><div class="kinds">
+      ${KINDS.map(x=>`<button class="kind" data-k="${x.k}"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[x.k]}</svg></span><span><b>${x.label}</b><span>${x.desc}</span></span><span class="arr" aria-hidden="true">›</span></button>`).join('')}
+      </div><div class="actions"><button class="btn ghost" id="back">Back</button></div></div>`;
+    document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ if(S.kind!==b.dataset.k) S.data={}; S.kind=b.dataset.k; S.step=2; render(); });
+    $('#back').onclick=()=>{ S.step=0; render(); };
+    return;
+  }
+  if(S.step===2){
+    const K=KINDS.find(x=>x.k===S.kind);
+    app.innerHTML=`<form class="card" id="f2" novalidate><div><span class="chip">${K.label}</span></div><h2>Details</h2>
+      ${layout(FIELDS[S.kind])}
+      <div class="checks" id="checks"></div>
+      <div class="actions"><button class="btn ghost" type="button" id="back">Back</button><button class="btn" type="submit">Review</button></div></form>`;
+    const f=$('#f2');
+    f.addEventListener('input',e=>{ S.data[e.target.id.slice(2)]=e.target.value; checks(); });
+    f.addEventListener('change',e=>{ S.data[e.target.id.slice(2)]=e.target.value; checks(); });
+    $('#back').onclick=()=>{ S.step=1; render(); };
+    f.onsubmit=e=>{ e.preventDefault(); const miss=FIELDS[S.kind].filter(x=>x[3] && !String(S.data[x[0]]||'').trim()).map(x=>x[1]);
+      if(miss.length){ alert2('#checks','Please fill in: '+miss.join(', ')); return; }
+      if(S.kind==='leave' && S.data.endDate < S.data.date){ alert2('#checks','The end date is before the start date.'); return; }
+      S.step=3; render(); };
+    checks(); return;
+  }
+  if(S.step===3){
+    const K=KINDS.find(x=>x.k===S.kind);
+    const rows=FIELDS[S.kind].filter(x=>String(S.data[x[0]]||'').trim()).map(x=>`<dt>${esc(x[1])}</dt><dd>${esc(x[2]==='date'?nice(S.data[x[0]]):S.data[x[0]])}</dd>`).join('');
+    app.innerHTML=`<div class="card"><div><span class="chip">${K.label}</span></div><h2>Check and send</h2>
+      <dl class="summary">${rows}<dt>Entered by</dt><dd>${esc(S.who.who)}</dd></dl>
+      <div class="checks" id="checks"></div>
+      <div class="actions"><button class="btn ghost" id="back">Edit</button><button class="btn" id="send">Send entry</button></div></div>`;
+    $('#back').onclick=()=>{ S.step=2; render(); };
+    $('#send').onclick=send; return;
+  }
+  if(S.step===4){
+    app.innerHTML=`<div class="card done"><div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+      <h2>Entry sent</h2><p class="lead" style="margin:0">${esc(KINDS.find(x=>x.k===S.kind).label)} – ${esc(S.data.name)}</p>
+      <p style="margin:0;color:var(--muted)">${S.who.email?`A confirmation will reach <b>${esc(S.who.email)}</b> within a few minutes. It tells you whether the entry was accepted or needs attention.`:'Add your email next time to get a confirmation for each entry.'}</p>
+      <div class="actions" style="justify-content:center"><button class="btn" id="again">Enter another</button></div></div>`;
+    $('#again').onclick=()=>{ S.kind=null; S.data={}; S.step=1; render(); };
+  }
+}
+function layout(list){ const out=[]; for(let i=0;i<list.length;i++){ const a=list[i], b=list[i+1];
+  const pair=a&&b&&['date','select','tel'].includes(a[2])&&['date','select','tel','text'].includes(b[2])&&!(a[4]&&a[4].hint)&&!(b[4]&&b[4].hint)&&b[2]!=='textarea';
+  if(pair){ out.push(`<div class="two">${fieldHtml(a,S.data[a[0]])}${fieldHtml(b,S.data[b[0]])}</div>`); i++; } else out.push(fieldHtml(a,S.data[a[0]])); } return out.join(''); }
+function nice(iso){ if(!iso) return ''; const d=new Date(iso+'T12:00:00'); return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+function alert2(sel,msg){ const el=$(sel); const n=document.createElement('div'); n.className='note crit'; n.textContent=msg; if(sel==='#checks'){ el.innerHTML=''; el.appendChild(n); } else { el.querySelector('.note')?.remove(); el.insertBefore(n, el.querySelector('.actions')); } }
+function checks(){
+  const d=S.data, out=[];
+  if(d.account){ const a=E.checkAccount(d.account,d.bank); a.flags.filter(f=>f[0]!=='info').forEach(f=>out.push(f)); }
+  if(d.mobile){ const p=E.normPhone(d.mobile); if(p.flag) out.push(p.flag); }
+  if(d.beneficiary && d.name && !E.nameMatch(d.beneficiary,d.name)) out.push(['warn',`Salary will go to another person's account (${d.beneficiary}). Is that correct?`]);
+  if(d.date && d.endDate && d.endDate>=d.date){ const n=Math.round((new Date(d.endDate)-new Date(d.date))/86400000)+1; out.push(['info',`${n} day${n>1?'s':''} of leave`]); }
+  const el=$('#checks'); if(el) el.innerHTML=out.map(f=>`<div class="note ${f[0]==='crit'?'crit':'warn'}">${esc(f[1])}</div>`).join('');
+}
+async function send(){
+  const b=$('#send'); b.disabled=true; b.innerHTML='<span class="spin"></span> Sending';
+  const F=CFG.fields, body=new URLSearchParams();
+  const put=(title,val)=>{ const id=F[title]; if(!id || val===undefined || val==='') return; body.append('entry.'+id, val); };
+  const putDate=(title,iso)=>{ const id=F[title]; if(!id||!iso) return; const [y,m,d]=iso.split('-'); body.append('entry.'+id+'_year',y); body.append('entry.'+id+'_month',String(+m)); body.append('entry.'+id+'_day',String(+d)); };
+  put('Your full name',S.who.who); put('Access code',S.who.code); put('Your email (for a confirmation)',S.who.email);
+  const K=KINDS.find(x=>x.k===S.kind); put('What are you entering?',K.label);
+  const d=S.data;
+  if(S.kind==='new'){ put('Staff full name (new joiner)',d.name); put('Employee ID',d.empId); put('Designation',d.designation); put('Qualification',d.qualification); put('Department',d.dept); putDate('Date of joining',d.date); put('Beneficiary name (if different)',d.beneficiary); put('Account number',d.account); put('Bank',d.bank); put('Mobile number',d.mobile); put('Remarks (new joiner)',d.remarks); }
+  if(S.kind==='left'){ put('Staff full name (left)',d.name); putDate('Exit / last working date',d.date); put('Reason (left)',d.reason); }
+  if(S.kind==='renewal'){ put('Staff full name (renewal)',d.name); putDate('Effective date',d.date); put('New salary (if known)',d.newPay); put('Remarks (renewal)',d.remarks); }
+  if(S.kind==='account'){ put('Staff full name (bank change)',d.name); put('Beneficiary name',d.beneficiary); put('New account number',d.account); put('Bank (bank change)',d.bank); }
+  if(S.kind==='leave'){ put('Staff full name (leave)',d.name); put('Reason for leave',d.reason); putDate('Leave start date',d.date); putDate('Leave end date',d.endDate); }
+  body.append('pageHistory','0,'+CFG.pages[K.label]);
+  try{
+    await fetch(CFG.action,{method:'POST',mode:'no-cors',body});
+    S.step=4; render();
+  }catch(err){
+    b.disabled=false; b.textContent='Send entry';
+    alert2('#checks','Could not send – check your internet connection and try again.');
+  }
+}
+render();
+</script>
+</body>
+</html>
